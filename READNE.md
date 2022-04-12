@@ -105,3 +105,19 @@ We should now have a glimmer of an idea that kinds dictate representations of st
 In our language, we will be primarily focussed on the role of kinding systems in allowing polymorphic substructural types, and in particular radically generalise the notion of substructural typing, to, in particular, allow kinding systems to control memory management. Our primary concern is that concurrent distributed systems and applications which must be hard real time, cannot use the normal solution for a cartesian closed category, namely garbage collection. C and C++ programmers regularly code for and document memory management rules, with a little poor quality help from data types like `shared_ptr` and `unique_ptr`. The quality is poor because enforcement is at run time, instead of what we really want, which is static type checking.
 
 C++ programmers know you can make a list and use abstraction to isolate the node pointers. This is a special case of separation logic in which we can use orinary pointers and enforce proper memory management by correctly coding the appropriate methods. We contend kinding systems can be used, much better, for the same job.
+
+Example: Subkinding
+-------------------
+This is of course the kinding analogue of subtyping, however it is much better defined in the sense that a subkind is precisely a subcategory. Clearly `UNITSUM` is a subkind of `COMPACT` which is a subkind of `TYPE`, which means a type which is a unitsum such as `42` is also a compact product as well as being an ordinary type.
+
+Metarecursion principle
+=======================
+
+One of the biggest problems with kinding systems is that once you allow polymorphic kinds, you have kind variables which need they domain specified, and clearly this requires **sorts**, a classification system a metalevel higher than kinds. And sorts need to be classified too .. where will it ever end?
+
+Some authors just have a univeral top level but this of course does not work and is only acceptable if the topic of interest is at a lower level. A much better solution is to observe that kinds are just categories, and so are sorts, so the meta-level distinction between them should be local and not global. For example, *Nat* the natural numbers is a type, a kind, and a sort as well, but it is also just a single category. The meta-recursion principle is based on the fact that categories can be used to describe categories, this scalability is one of the most fundamental reasons for interest in category theory.
+
+Language Domain
+===============
+
+The domain of our language must cover the lowest level kernel development all the way to distributed concurrent computation. It is clear the structures involved to scale these heights will change as the computational level increases. However a set of distinct languages to cover narrow bands of scale is simply not acceptable: we must have distinctions but without losing overall coherence .. and category theory is the only known way to do this.
