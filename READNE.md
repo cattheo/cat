@@ -57,11 +57,30 @@ Example: compact products
 -------------------------
 The standard product functor produces a sequence of addressable objects aligned and padded, according to C layout rules. However there is another useful product, a compact linear product, defined as follows: let the types 0 and 1 be the void type and canonical unit, specify they're compact linear, and then specify any compact product or sum of a compact arguments is compact. We use the notation `5` to mean the type `1+1+1+1+1`.
 
-A compact product is then simply an integer, formed by the usual variable radix number system. Using the notation `+ for the compact product type, and `, for a compact value, the type ```5`+3``` is then the integer subrange 0..14 with projections `x/3` and `x%3`. And so
+A compact product is then simply an integer, formed by the usual variable radix number system. Using the notation ``` `+``` for the compact product type, and ``` `,``` for a compact value, the type ```5`+3``` is then the integer subrange 0..14 with projections `x/3` and `x%3`. And so
 ```
 fun pair[X:COMPACT, Y:COMPACT] (x:X, y:Y): X`+Y => x`,y;
 ```
 can be used to construct a compact pair. Note that the kind `COMPACT` is mandatory, since `+ can only operate on compact types.
 
 It is tempting to think a kind is then a constraint. This is no more or less true than saying the domain of a function is a constraint: we prefer to think of a kind as a specification of the domain category of a functor.
+
+Example: Arrays
+---------------
+We're now going to introduce an array functor:
+```
+typedef lineararray[T,I:UNITSUM] = T ^ I;
+```
+The indexing operator is an exponential, as is the usual function application, however we prefer to think of an array as a tuple in which all components have the same type. The use of the kind `UNITSUM` restricts the index type to a sum of units. For example `int^3` is an array of three integers, as usual, but the index type is a unitsum, not an integer. This is very nice because array bounds checks are never necessary.
+
+However the `lineararray` functor is overly restrictive and this is perfectly good:
+```
+typedef array[T, I:COMPACT] = T^I;
+var x : int ^ (3 `* 2) = (1,2),(3,4),(5,6);
+var v = x . (2`,0); //5 
+```
+which is of course a matrix. Note the index is a compact tuple (not an ordinary tuple). This is very beautiful because it allows polyadic (rank independent) array computations.
+
+
+
 
