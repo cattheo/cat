@@ -81,6 +81,27 @@ var v = x . (2`,0); //5
 ```
 which is of course a matrix. Note the index is a compact tuple (not an ordinary tuple). This is very beautiful because it allows polyadic (rank independent) array computations.
 
+Example: pointers
+-----------------
 
+We introduce a pointer type ```&T``` and provide pointer projections:
+```
+var x = 1,2;
+var px = &x;
+px . 0 <- 42;
+```
+Here, the 0'th projection of a pointer to a tuple is defined as the pointer than locates te first component of the object pointed at. Note this is not an ordinary projection, since pointers themselves are not products.
 
+However we have a problem! What if a product is compact?
+It turns out, a pointer to a component of a compact product exists, but it requires three machine words instead of one: one word is required to find the compact object, it is an ordinary pointer. If we throw in a divisor and modulus, we can now extract the component by the formula
+```
+*p / divisor % modulus
+```
 
+Therefore, even though the representation is quite different, we can do polymorphic operations on compact product pointers, however, the **kind** of the pointer is not the same as an ordinary pointer. 
+
+We should now have a glimmer of an idea that kinds dictate representations of structural typing systems and are absolutely essential for specifying the domains of functors.
+
+In our language, we will be primarily focussed on the role of kinding systems in allowing polymorphic substructural types, and in particular radically generalise the notion of substructural typing, to, in particular, allow kinding systems to control memory management. Our primary concern is that concurrent distributed systems and applications which must be hard real time, cannot use the normal solution for a cartesian closed category, namely garbage collection. C and C++ programmers regularly code for and document memory management rules, with a little poor quality help from data types like `shared_ptr` and `unique_ptr`. The quality is poor because enforcement is at run time, instead of what we really want, which is static type checking.
+
+C++ programmers know you can make a list and use abstraction to isolate the node pointers. This is a special case of separation logic in which we can use orinary pointers and enforce proper memory management by correctly coding the appropriate methods. We contend kinding systems can be used, much better, for the same job.
