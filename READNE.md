@@ -57,11 +57,11 @@ Example: compact products
 -------------------------
 The standard product functor produces a sequence of addressable objects aligned and padded, according to C layout rules. However there is another useful product, a compact linear product, defined as follows: let the types 0 and 1 be the void type and canonical unit, specify they're compact linear, and then specify any compact product or sum of a compact arguments is compact. We use the notation `5` to mean the type `1+1+1+1+1`.
 
-A compact product is then simply an integer, formed by the usual variable radix number system. Using the notation ``` `+``` for the compact product type, and ``` `,``` for a compact value, the type ```5`+3``` is then the integer subrange 0..14 with projections `x/3` and `x%3`. And so
+A compact product is then simply an integer, formed by the usual variable radix number system. Using the notation ``` `*``` for the compact product type, and ``` `,``` for a compact tuple value, the type ```5`*3``` can then be represented by the integer subrange 0..14 with projections `x/3` and `x%3`. And so
 ```
-fun pair[X:COMPACT, Y:COMPACT] (x:X, y:Y): X`+Y => x`,y;
+fun pair[X:COMPACT, Y:COMPACT] (x:X, y:Y): X`*Y => x`,y;
 ```
-can be used to construct a compact pair. Note that the kind `COMPACT` is mandatory, since `+ can only operate on compact types.
+can be used to construct a compact pair. Note that the kind `COMPACT` is mandatory, since `* can only operate on compact types.
 
 It is tempting to think a kind is then a constraint. This is no more or less true than saying the domain of a function is a constraint: we prefer to think of a kind as a specification of the domain category of a functor.
 
@@ -121,3 +121,14 @@ Language Domain
 ===============
 
 The domain of our language must cover the lowest level kernel development all the way to distributed concurrent computation. It is clear the structures involved to scale these heights will change as the computational level increases. However a set of distinct languages to cover narrow bands of scale is simply not acceptable: we must have distinctions but without losing overall coherence .. and category theory is the only known way to do this.
+
+Project Objectives
+==================
+
+The Felix programming language has been used to illustrate the role of kinding systems. However whilst, unlike many other languages, Felix was designed from the ground up to support polymorphism, the kinding system has been bolted on after the fact. The requirement to manage heap allocated objects in a real time context has introduced difficulties which suggest a redesign and rewrite is needed.
+
+Considerable theoretical work is still required. In partcular, category theory has a number of foundational issues, and software systems must be built with constructive, not intuitionistic methods. For example a product functor cannot merely pick out a representation type as suggested in the examples, where the product property requires the existence of projections, it must actually provide the projections. Unfortunately the obvious method is to provide a pair of functions, but this begs the question of how to form a product since such a pair is itself a product.
+
+The relationship between the system and related features of high level languages such as Ocaml modules and functors, and Haskell type classes, must be established.
+
+Category theory is ill suited for software development in the sense that it is an equational theory which constructive logic requires an equality operator, but arbitrary functions cannot be compared. We consider using Jay categories, which are categories with representations using Jay's lambda SF calculus.
