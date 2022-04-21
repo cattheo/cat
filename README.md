@@ -6,7 +6,10 @@ A programming language based on category theory.
 The key feature of this system is the presence of a high power kinding system. A kind is just a category.
 
 Kinds are needed to work with functors, in the same way types are needed to work with functions.
-The key insight is that kinds provide the management tools for structural typing systems, whilst type classes define abstractions and bind instances to representations.
+The key insight is that kinds provide the management tools for structural typing systems, 
+whilst type classes define abstractions and bind instances to representations.
+
+Motivational examples here are from the Felix programming language.
 
 Example: functor composition
 -----------------------------
@@ -45,25 +48,33 @@ Example: uniqueness typing
 --------------------------
 Consider the function:
 ```
-fun dup[T:TYPE} (x:T): T * T => x,x;
+fun dup[T:TYPE] (x:T): T * T => x,x;
 ```
 This is just fine in a standard type system, but if we allow T to bind to a type designating exclusive ownership of a reference, type checking will pass but we have allows an alias to be created, so the system would be unsound. To prevent this we add an overload:
 ```
 fun dup[T:LINEAR) (x:T) => let y = unbox x in y,y
 ```
-where `unbox` discards the uniqueness property.  We can only call this overload with a unique type, because `unbox` fails if given a non-unique type.
+where `unbox` discards the uniqueness property. 
+We can only call this overload with a unique type, because `unbox` fails if given a non-unique type.
 
 Example: compact products
 -------------------------
-The standard product functor produces a sequence of addressable objects aligned and padded, according to C layout rules. However there is another useful product, a compact linear product, defined as follows: let the types 0 and 1 be the void type and canonical unit, specify they're compact linear, and then specify any compact product or sum of a compact arguments is compact. We use the notation `5` to mean the type `1+1+1+1+1`.
+The standard product functor produces a sequence of addressable objects aligned and padded, 
+according to C layout rules. However there is another useful product, a compact linear product, 
+defined as follows: let the types 0 and 1 be the void type and canonical unit, specify they're compact linear,
+and then specify any compact product or sum of a compact arguments is compact. We use the notation `5` to mean the type `1+1+1+1+1`.
 
-A compact product is then simply an integer, formed by the usual variable radix number system. Using the notation ``` `*``` for the compact product type, and ``` `,``` for a compact tuple value, the type ```5`*3``` can then be represented by the integer subrange 0..14 with projections `x/3` and `x%3`. And so
+A compact product is then simply an integer, formed by the usual variable radix number system.
+Using the notation ``` `*``` for the compact product type, and ``` `,``` 
+for a compact tuple value, the type ```5`*3``` can then be represented by the integer subrange 0..14 with projections `x/3` and `x%3`. 
+And so
 ```
 fun pair[X:COMPACT, Y:COMPACT] (x:X, y:Y): X`*Y => x`,y;
 ```
-can be used to construct a compact pair. Note that the kind `COMPACT` is mandatory, since `* can only operate on compact types.
+can be used to construct a compact pair. Note that the kind `COMPACT` is mandatory, since ``` `*``` can only operate on compact types.
 
-It is tempting to think a kind is then a constraint. This is no more or less true than saying the domain of a function is a constraint: we prefer to think of a kind as a specification of the domain category of a functor.
+It is tempting to think a kind is then a constraint. 
+This is no more or less true than saying the domain of a function is a constraint: we prefer to think of a kind as a specification of the domain category of a functor.
 
 Example: Arrays
 ---------------
@@ -79,7 +90,8 @@ typedef array[T, I:COMPACT] = T^I;
 var x : int ^ (3 `* 2) = (1,2),(3,4),(5,6);
 var v = x . (2`,0); //5 
 ```
-which is of course a matrix. Note the index is a compact tuple (not an ordinary tuple). This is very beautiful because it allows polyadic (rank independent) array computations.
+which is of course a matrix. Note the index is a compact tuple (not an ordinary tuple). 
+This is very beautiful because it allows polyadic (rank independent) array computations.
 
 Example: pointers
 -----------------
@@ -90,17 +102,27 @@ var x = 1,2;
 var px = &x;
 px . 0 <- 42;
 ```
-Here, the 0'th projection of a pointer to a tuple is defined as the pointer than locates te first component of the object pointed at. Note this is not an ordinary projection, since pointers themselves are not products.
+Here, the 0'th projection of a pointer to a tuple is defined as the pointer 
+that locates the first component of the object pointed at. 
+Note this is not an ordinary projection, since pointers themselves are not products.
 
 However we have a problem! What if a product is compact?
-It turns out, a pointer to a component of a compact product exists, but it requires three machine words instead of one: one word is required to find the compact object, it is an ordinary pointer. If we throw in a divisor and modulus, we can now extract the component by the formula
+It turns out, a pointer to a component of a compact product exists, 
+but it requires three machine words instead of one: one word is required to find the compact object, 
+it is an ordinary pointer. If we throw in a divisor and modulus, we can now extract the component by the formula
 ```
 *p / divisor % modulus
 ```
 
-Therefore, even though the representation is quite different, we can do polymorphic operations on compact product pointers, however, the **kind** of the pointer is not the same as an ordinary pointer. 
+Concept: Kinds are functor domains
+----------------------------------
 
-We should now have a glimmer of an idea that kinds dictate representations of structural typing systems and are absolutely essential for specifying the domains of functors.
+Therefore, even though the representation is quite different, 
+we can do polymorphic operations on compact product pointers, however,0
+ the **kind** of the pointer is not the same as an ordinary pointer. 
+
+We should now have a glimmer of an idea that kinds dictate representations of 
+structural typing systems and are absolutely essential for specifying the domains of functors.
 
 In our language, we will be primarily focussed on the role of kinding systems in allowing polymorphic substructural types, and in particular radically generalise the notion of substructural typing, to, in particular, allow kinding systems to control memory management. Our primary concern is that concurrent distributed systems and applications which must be hard real time, cannot use the normal solution for a cartesian closed category, namely garbage collection. C and C++ programmers regularly code for and document memory management rules, with a little poor quality help from data types like `shared_ptr` and `unique_ptr`. The quality is poor because enforcement is at run time, instead of what we really want, which is static type checking.
 
