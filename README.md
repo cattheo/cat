@@ -326,7 +326,63 @@ chip countdown[T] (n:int)
     pin inp: %<T
     pin out: %>T
 { 
-  for i in 1 to n perform write (io.out, read io.inp);
+  for i in 1..5 perform write (io.out, read io.inp);
 }
 ```
 anywhere in a pipeline afer the source and before the sink.
+
+Processes
+=========
+
+An essential factor in Hoare's Communication Sequential Processes (CSP)
+is concurrency, whereas Felix Communincating Sequential Coroutines (CSC)
+is essentially the same model with concurrent execution replaced by
+indeterminacy: this is a major simplification which ensures all events
+are totally ordered, even if the actual ordering is not fully deteminate.
+
+General CSP is too difficult for most programming, however we do need to
+allow some coroutines to operate concurrently when it is safe. Felix channels
+are fully thread safe, and, pure coroutines can always run concurrently.
+
+A coroutine is **pure** if it has no side effects, that is, all input comes
+from channels and all output goes to channels.
+
+However, coroutine systems are run by a scheduler subroutine which returns control
+to the caller and results must be stored via pointers to variables in the callers
+frame. Locks are provided to protect these variables however this does not ensure
+that arbitrary coroutines can run concurrently since now referential transparency
+is lost due to such stores being side-effects.
+
+It is an open issue how to *type* coroutines, channels, and circuits in such a
+way that allows some coroutines to run concurrently.
+
+We note that CSP is ideally suited to distributed processing since network connectivity
+basically consists of processes communicating via asynchronous channels. However the Felix
+model is not suited to distributed processing because it relies on garbage collection.
+
+Real time behaviour
+===================
+
+The Felix model is not suitable for real time operations because it uses
+a garbage collector. Again it is an open issue how to manage heap storage
+in such a way that world stops do not occur, and, more generally,
+hard performance bounds can be met.
+
+Indeed, the primary motivation for this project is to investiagate
+the use of higher kinding systems to constrain storage management
+in such a way that distributed real time processing is possible.
+Moreover, such models will certainly preclude general cartesian
+closed categories, so we require a way to **separate** parts of the
+program which do not have to run real time to allow the use of closures
+in heap data, which is excluded in other parts of the programn.
+
+Again, we must find a way to manage the coupling between the more
+general and more restricted parts of our programs.
+
+
+
+
+
+
+
+
