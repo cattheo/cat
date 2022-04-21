@@ -283,6 +283,7 @@ chip procedure[D] (p:D->0)
 }
 ```
 and construct a printer by passing it the system `println` routine:
+```
 device printer[T] = procedure (println of T);
 ```
 Now we want to process the list somehow with the following transducer:
