@@ -379,6 +379,51 @@ in heap data, which is excluded in other parts of the programn.
 Again, we must find a way to manage the coupling between the more
 general and more restricted parts of our programs.
 
+Example: Heap management by Abstraction
+---------------------------------------
+
+A simple way to manage heap store in C++ is to encapsulate a container in a
+class object. For example a list class with push and pop methods that
+push and pop values of some type gives exclusive access to the list nodes
+to the container object.  This ensures that the nodes are, in effect, on a 
+heap local to the container separated from all other pointers. So the nodes
+can be allocated on a push and deallocated on a pop, or, by the destructor.
+
+One notes C++ standard library containers do not have this property since
+iterators provide references to subobjects of nodes, raising issues of
+iterator validity. 
+
+Ideally the *type system* should provide a way to ensure local exclusive
+access.
+
+Example: Heap as stack auxilliary
+---------------------------------
+
+In C++ local variables live on the machine stack, and are lost when
+the subroutine returns. Pointers to these variables are fine as long
+as they do not exceed the lifetime of the subroutine stack frame.
+Additionally there is a need for variable sized objects, such as a C++ string.
+The store for a string is deleted when the variable is lost on return
+by the string class destructor.
+
+However there is another way, related to the previous example:
+local variables are private to a subroutine, due to functional abstraction,
+so we could have a single arena heap for all allocations by the code
+of the subroutine, and delete the arena on return. This is of course
+very much faster than deleting multiple heap objects.
+
+Again we desire that assurances of correct usage will be given
+by the type system.
+
+Implications
+------------
+
+The examples suggest the type system can help control memory use.
+And of course, when the types involved are themselves abstracted
+by polymorphism, we again require a kinding system to ensure
+the management protocols of a type conform to expectations.
+
+
 
 
 
