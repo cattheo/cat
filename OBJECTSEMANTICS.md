@@ -3,25 +3,25 @@
 ## In C
 ### L- and R-value
 
-A variable is an lvalue.
-A dereferenced pointer is an lvalue.
-A struct field of an lvalue is an lvalue.
-Other expressions are rvalues.
+- A variable is an lvalue.
+- A dereferenced pointer is an lvalue.
+- A struct field of an lvalue is an lvalue.
+- Other expressions are rvalues.
 
 ### L- and R-context
 
-The outer LHS of an assignment or argument is an L-context.
-The address of operator is an L-context.
-Other contexts are called R-contexts.
+- The outer LHS of an assignment or argument is an L-context.
+- The address of operator is an L-context.
+- Other contexts are called R-contexts.
 
 ### Denotation
 
-When an L-value occurs in an L-context it denotes the 
+- When an L-value occurs in an L-context it denotes the 
 underlying object.
 
-An R-value is not permitted in an L-context.
+- An R-value is not permitted in an L-context.
 
-Any expression in an R-contexts denotes a value.
+- Any expression in an R-contexts denotes a value.
 If it is an L-value, then the value of the underlying object.
 
 ### Notes
