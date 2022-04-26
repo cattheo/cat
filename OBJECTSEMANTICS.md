@@ -1,22 +1,20 @@
-Object Semantics
-================
+# Object Semantics
 
-In C
-----
-## L- and R-value
+## In C
+### L- and R-value
 
 A variable is an lvalue.
 A dereferenced pointer is an lvalue.
 A struct field of an lvalue is an lvalue.
 Other expressions are rvalues.
 
-## L- and R-context
+### L- and R-context
 
 The outer LHS of an assignment or argument is an L-context.
 The address of operator is an L-context.
 Other contexts are called R-contexts.
 
-## Denotation
+### Denotation
 
 When an L-value occurs in an L-context it denotes the 
 underlying object.
@@ -26,14 +24,13 @@ An R-value is not permitted in an L-context.
 Any expression in an R-contexts denotes a value.
 If it is an L-value, then the value of the underlying object.
 
-## Notes
+### Notes
 
 The specifications above are purely syntactic.
 The rules are fragile in that any syntactic externsion could lead
 to an open issue with respect to denotation.
 
-In C++
-------
+## In C++
 
 In C++ an lvalue is an expression which is either a variable
 or has reference type. The binding rules are complex. It has
@@ -42,8 +39,7 @@ different behaviours.
 
 In short is an extreme mess.
 
-In Felix
---------
+## In Felix
 
 In Felix a value is put into an object with a system procedure:
 
