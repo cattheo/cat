@@ -18,6 +18,23 @@ We define groups of syntax with a *syntex* statement:
     }
 ```
 
+These modules are also called *Domain Specific Sub-Languages* or **DSSL**.
+
+### Qualified names
+The name of a DSSL can be used as a qualifier to refer to a public symbol
+in another DSSL:
+```
+x := A::b =># '_1';
+```
+
+### Private symbols
+A non-terminal which is used only as a local helper can be made
+private to prevnt qualified access from another DSSL:
+```
+private helper := ...
+```
+
+
 ### Priortities
 Syntax like this defines a partial order of priorities:
 ```
@@ -105,7 +122,7 @@ The EBNF repetition operators produce Scheme lists:
 - A repetition operator applies to the symbol on its left.
 - Groups can be defined using parentheses `()` and act as a single symbol
 
-##$ Sequence and Alternation
+### Sequence and Alternation
 - The usual EBNF sequencing operator is juxtaposition (operator whitespace)
 - Alternation usea a vertical bar `|`
 - Each alternative requires its own action code
@@ -114,7 +131,7 @@ The EBNF repetition operators produce Scheme lists:
 - Attributes are refered to numerically so that `_1` is the attribute of the
 first symbol in a production, `_2` is the second symbol, etc.
 - The attribute is the evaluated Scheme expression associated with a non-terminal, or,
-- a list of attribbutes if a repetition operator is applied to a group
+- a list of attributes if a repetition operator is applied to a group
 
 ## Example
 Here is a conditional expression in Felix:
@@ -207,5 +224,48 @@ Note that the Scheme code is defining an S-expression attribute representing a
 literal to the felix compiler based on the actual string the symbol, considered
 as a regular expression, has parsed.
 
+# Requires clause
+A DSSL can depend on others:
+```
+syntax X { 
+  requires A, B, C;
+}
+```
+Requirement is transitive.
+
+# Using Syntax
+DSSLs can be defined anywhere in the code statements are allowed, but
+should generally be given at the top. The ability to parse a DSSL is a 
+fixed part of the bootstrap grammar.
+
+The initial grammar can be extended with DSSLs by opening them.
+Merely defining a DSSL simply creates a saveable data structure
+representing a grammar.
+```
+open syntax felix;
+```
+When a DSSL is opened, the transitive closure of dependencies
+specified by require clauses is loaded. The parser builds
+a completely new automaton which then takes over all parsing
+from the point of the open statement.
+
+Felix ensures the automaton is cached, and the parse automatically
+uses the cached version if possible.
+
+# SCHEME statement
+The SCHEME statement is used to add definitions to the Scheme interpreter.
+```
+SCHEME """
+(begin
+  ;; lists
+  (define (first x)(car x))
+  (define (second x)(cadr x))
+  (define (third x)(caddr x))
+  (define (tail x)(cdr x))
+  (define fold_left
+    (lambda (f acc lst)
+      (if (null? lst) acc (fold_left f (f acc (first lst)) (tail lst)))))
+)
+```
 
 
