@@ -1,0 +1,3 @@
+[submodule "felix"]
+	path = felix
+	url = https://github.com/felix-lang/felix.git
