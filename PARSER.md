@@ -188,7 +188,67 @@ which always defines a macro. It is expaned as if `_1` where written and can
 only accepts a single term on the RHS.
 
 ## Open Recursion
-TBD
+Consider the following conventional grammar:
+```
+syntax X {
+  requires statements;
+  Atom := "9" | "(" Expr ")";
+  Prod := Atom ("*" Prod) | Atom;
+  Sum := Prod ("+" Sum) | Prod;
+  Expr := Sum;
+  stmt := "newcrap" Expr ";" =># """(begin (display _2)(display "\n")())""";
+}
+```
+with this test case
+```
+open syntax X;
+begin
+  newcrap 9+9*(9+9*9);
+  println$ "Hello";
+end
+```
+This form requires extensive invasion to extend or remove
+productions. Now here is the *open/closed* formulation:
+```
+syntax Y {
+  requires statements;
+  // Open forms 
+  Atom top := "9" | "(" top ")";
+  Prod atom := atom ("*" Prod atom) | atom ;
+  Sum prod := prod ("+" Sum prod) | prod;
+
+  // cycle fixation
+  A = Atom<E>; // recursion variable E
+  P = Prod<A>;
+  S = Sum<P>;
+  E = S; // fixpoint
+  Expr := E;
+  stmt := "xnewcrap" Expr ";" =># """(begin (display _2)(display "\n")())""";
+}
+```
+with a similar test case:
+```
+open syntax Y;
+begin
+  xnewcrap 9+9*(9+9*9);
+  println$ "Hello";
+end
+```
+which productes an identical result as witnessed in the output:
+```
+~/felix>flx g.flx
+Opening syntax extensions /Users/skaller/felix/g.flx: line 15, cols 1 to 15
+Parsed open of syntax extensions X
+((((9)) (+ (((9) (* ((( ((((9)) (+ (((9) (* ((9)))))))) )))))))))
+Opening syntax extensions /Users/skaller/felix/g.flx: line 41, cols 1 to 15
+Parsed open of syntax extensions Y
+((((9)) (+ (((9) (* ((( ((((9)) (+ (((9) (* ((9)))))))) )))))))))
+Hello
+Hello
+```
+
+This for is modular in that the open productions can be selected at will
+and sequenced in any order to define one of more expression syntaxen.
 
 ## Regular definitions
 All terminals are potential given by regular expressions.
