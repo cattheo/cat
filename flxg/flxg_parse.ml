@@ -17,12 +17,15 @@ let locate_file ?(include_dirs=[]) f =
 let rec render path f =
   if String.length f < 1 then [] else (* failwith "Empty --import filename"; *)
   if String.sub f 0 1 = "@" then
+    (* let _= print_endline ("render " ^ f) in *)
     let f = locate_file ~include_dirs:path (String.sub f 1 (String.length f - 1)) in
+    (* let _= print_endline ("rendered " ^ f) in *)
     let f = open_in f in
     let res = ref [] in
     try
       let rec aux () =
         let line = input_line f in
+        (* print_endline ("Handling line " ^ line); *)
         res := !res @ render path line;
         aux ()
       in aux ()
@@ -35,7 +38,10 @@ let rec render path f =
 (* -------------------------------------------------------------------------- *)
 (** Parse an implementation file. *)
 let parse_syntax (state:compiler_options_t) =
+  let debug = state.print_flag in
+(* print_endline ("Parse syntax .. file = " ^ String.concat "," state.syntax); *)
   let include_dirs = state.include_dirs in
+(* print_endline ("Include dirs = " ^ String.concat ", " state.include_dirs); *)
 
   (* Get native file paths for each path in include directory. *)
   let synfiles = 
@@ -46,10 +52,10 @@ let parse_syntax (state:compiler_options_t) =
   in
 
   (* Do the parsing. *)
-(* print_endline ("//Parsing syntax " ^ String.concat ", " synfiles); *)
   let parser_state = 
     List.fold_left
       (fun state file -> 
+        if debug then print_endline ("//Parsing syntax " ^ file); 
         let hash_includes, local_data = 
           Flx_parse_driver.parse_file_with_syntax_unit ~include_dirs state file
         in local_data)
@@ -116,7 +122,6 @@ let parse_syntax (state:compiler_options_t) =
 (* -------------------------------------------------------------------------- *)
 (** Load the syntax from file or rebuild it. Either way, it goes into memory. *)
 let load_syntax state =
-
   (* Did the programmar enter 'flx --force-compiler'? *)
   if state.force_recompile then
     Flx_profile.call "Flxg_parse.parse_syntax" parse_syntax state
@@ -126,14 +131,14 @@ let load_syntax state =
     let filename = state.automaton_filename in
 
     try
-      (* print_endline ("Trying to load automaton " ^ filename); *)
+      print_endline ("Trying to load automaton " ^ filename);
 
       (* Load atomaton from binary file. *)
       let oc = open_in_bin filename in
       let local_data = Marshal.from_channel oc in
       let parsing_device = Marshal.from_channel oc in
       close_in oc;
-      (* print_endline "Loaded automaton from disk"; *)
+      print_endline "Loaded automaton from disk";
 
       (* Create environment for parsing system. *)
       let env = Flx_parse_data.global_data.Flx_token.env in
@@ -151,7 +156,7 @@ let load_syntax state =
       print_endline ("Can't load automaton '"^filename^"'from disk: building!");
 
       (* Recover by parsing everything instead of relying on the disk image. *)
-      Flx_profile.call "Flxg_parse.parse_syntax" parse_syntax state
+      parse_syntax state
 
 (* -------------------------------------------------------------------------- *)
 (** Parse an implementation file *)
@@ -193,12 +198,6 @@ let parse_file state parser_state file =
       (fun scm -> Ocs2sex.ocs2sex scm) 
       (Flx_parse_driver.parser_data parser_state) 
   in
-  List.iter (fun sex ->
-    print_endline "OCS scheme term converted to s-expression:";
-    Sex_print.sex_print sex
-  ) stmts
-  ;
-
   stmts
 
 

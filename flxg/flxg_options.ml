@@ -35,7 +35,7 @@ let fixit file =
   let s =
     if n>1 then
       if String.sub s (n-1) 1 = Flx_filesys.dir_sep
-      then String.sub s (n-1) 1
+      then String.sub s 0 (n-1) 
       else s
     else s
   in
@@ -46,8 +46,11 @@ let fixup files = List.map fixit files
 
 
 let get_options raw_options =
+(* print_endline ("get_options: RAW include_dirs = " ^ String.concat ", " (get_keys_values raw_options ["I"; "include"] )); *)
   let include_dirs= fixup (get_keys_values raw_options ["I"; "include"]) in
+(* print_endline ("get_options: fixed up include_dirs = " ^ String.concat ", " include_dirs); *)
   let include_dirs = List.map (fun s -> Flx_filesys.mkabs s) include_dirs in
+(* print_endline ("get_options: include_dirs = " ^ String.concat ", " include_dirs); *)
   let options =
   {
     force_recompile = check_keys raw_options ["force"];
