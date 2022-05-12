@@ -1,9 +1,15 @@
 parser:
 	flx flx_build_flxg.flx
 
-test:
+small-test:
 	build/flxg-tmp/parser.exe  -v --force --cache_dir=cash --output_dir=. \
-	--syntax=@/Users/skaller/felix/build/release/share/lib/grammar/grammar.files \
-	--include=/Users/skaller/felix/build/release/share/lib/ \
+	--syntax=@felix/build/release/share/lib/grammar/grammar.files \
+	--include=felix/build/release/share/lib/ \
+	hello.flx
+
+big-test:
+	build/flxg-tmp/parser.exe  -v --force --cache_dir=cash --output_dir=. \
+	--syntax=@felix/build/release/share/lib/grammar/grammar.files \
+	--include=felix/build/release/share/lib/ \
 	flx_build_flxg.flx
 
