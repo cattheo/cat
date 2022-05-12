@@ -55,7 +55,7 @@ On MacOS:
 ```
   export PATH=$PWD/felix/build/release/host/bin:$PATH
   export DYLD_LIBRARY_PATH=$PWD/felix/build/release/host/lib/rtl:$DYLD_LIBRARY_PATH
-``
+```
 On Windows:
 ```
   set PATH=%CD%\felix\build\release\host/bin;%CD%\felix\build\release\host\lib\rtl;%PATH%
