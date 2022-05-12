@@ -50,7 +50,7 @@ On Linux with bash:
 ```
   export PATH=$PWD/felix/build/release/host/bin:$PATH
   export LD_LIBRARY_PATH=$PWD/felix/build/release/host/lib/rtl:$LD_LIBRARY_PATH
-``
+```
 On MacOS:
 ```
   export PATH=$PWD/felix/build/release/host/bin:$PATH
